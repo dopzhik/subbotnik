@@ -92,11 +92,9 @@ def get_menu_database(client_id=None):
                     )
                     cur.execute(query, (client_id,))
                     result = cur.fetchone()
+                return result
 
     except Exception as e:
         print(f"Ошибка поймана. Детали: {e}")
-
-    finally:
-        return result
 
 # user_dict: dict = {}
