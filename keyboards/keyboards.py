@@ -2,6 +2,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from lexicon.lexicon import lexicon
 from config_data.config import load_config
+from database.database import get_menu_database
 
 admins = load_config().tg_bot.admin_ids
 
@@ -38,10 +39,11 @@ def create_services_keyboards(*args):
     return kb_builder.as_markup()
 
 
-def create_orders_keyboards(user_dict):
+def create_orders_keyboards():
     kb_builder = InlineKeyboardBuilder()
-    for key, value in user_dict.items():
-        kb_builder.row(InlineKeyboardButton(text=f"{value['name']}-{value['adres']}", callback_data=str(key)))
+    data = get_menu_database()
+    for id_client, name, phone, address, *other in data:
+        kb_builder.row(InlineKeyboardButton(text=f"{name}-{address}-{id_client}", callback_data=str(id_client)))
     kb_builder.row(
         InlineKeyboardButton(
             text='Главное меню',

@@ -7,7 +7,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state, State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
 from lexicon.lexicon import lexicon, lexicon_services
-from database.database import user_dict
+from database.database import set_database, get_menu_database
 
 # from Bookbot.services.file_handling import book
 
@@ -117,7 +117,8 @@ async def process_not_pollution(callback: CallbackQuery):
 @router.message(StateFilter(FSMFillForm.fill_date))
 async def process_date_sent(message: Message, state: FSMContext):
     await state.update_data(dat=message.text)
-    user_dict[message.from_user.id] = await state.get_data()
+    user_info = await state.get_data()
+    await set_database(message.from_user.id, user_info)
     await state.clear()
     await message.answer('Спасибо! Ваши данные сохранены!\n\nНаш менеджер свяжаться с вам в рабочее время',
                          reply_markup=create_main_menu())
@@ -126,16 +127,18 @@ async def process_date_sent(message: Message, state: FSMContext):
 @router.callback_query(F.data == 'orders', StateFilter(default_state))
 async def process_orders_command(callback: CallbackQuery):
     await callback.message.edit_text('Заявки',
-                                     reply_markup=create_orders_keyboards(user_dict))
+                                     reply_markup=create_orders_keyboards())
 
 @router.callback_query(F.data.isdigit(), StateFilter(default_state))
 async def process_show_orders(callback: CallbackQuery):
-    if int(callback.data) in user_dict:
+    data = get_menu_database()
+    if int(callback.data) in (fields[0] for fields in data):
+        client = get_menu_database(int(callback.data))
         await callback.message.edit_text(
-            f'Имя: {user_dict[int(callback.data)]["name"]}\n\n'
-            f'Телефон: {user_dict[int(callback.data)]["phone"]}\n\n'
-            f'Адрес: {user_dict[int(callback.data)]["adres"]}\n\n'
-            f'Степень загрязнения: {lexicon[user_dict[int(callback.data)]["pollution"]]}\n\n'
-            f'Дата заявки: {user_dict[int(callback.data)]["dat"]}',
+            f'Имя: {client[1]}\n\n'
+            f'Телефон: {client[2]}\n\n'
+            f'Адрес: {client[3]}\n\n'
+            f'Степень загрязнения: {lexicon[client[4]]}\n\n'
+            f'Дата заявки: {client[5]}',
             reply_markup=create_main_menu()
         )
