@@ -1,15 +1,16 @@
 import psycopg2
+import os
 from psycopg2 import Error, sql
 
 
 async def create_db():
     try:
         with psycopg2.connect(
-                dbname="postgres",
-                user="postgres",
-                password="12345",
-                host="localhost",
-                port="5432"
+                dbname=os.getenv('DB_NAME'),
+                user=os.getenv('DB_USER'),
+                password=os.getenv('DB_PASSWORD'),
+                host=os.getenv('DB_HOST'),
+                port=os.getenv('DB_PORT')
         ) as conn:
             with conn.cursor() as curr:
                 try:
@@ -35,11 +36,11 @@ async def create_db():
 async def set_database(id_client, fsm_dict):
     try:
         with psycopg2.connect(
-                dbname="postgres",
-                user="postgres",
-                password="12345",
-                host="localhost",
-                port="5432"
+                dbname=os.getenv('DB_NAME'),
+                user=os.getenv('DB_USER'),
+                password=os.getenv('DB_PASSWORD'),
+                host=os.getenv('DB_HOST'),
+                port=os.getenv('DB_PORT')
         ) as conn:
             with conn.cursor() as cur:
                 try:
@@ -56,11 +57,11 @@ async def set_database(id_client, fsm_dict):
 def get_menu_database(client_id=None):
     try:
         with psycopg2.connect(
-                dbname="postgres",
-                user="postgres",
-                password="12345",
-                host="localhost",
-                port="5432"
+                dbname=os.getenv('DB_NAME'),
+                user=os.getenv('DB_USER'),
+                password=os.getenv('DB_PASSWORD'),
+                host=os.getenv('DB_HOST'),
+                port=os.getenv('DB_PORT')
         ) as conn:
             with conn.cursor() as cur:
                 if client_id is None:
